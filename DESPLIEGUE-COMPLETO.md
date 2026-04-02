@@ -3,7 +3,7 @@
 ## Arquitectura del Proyecto
 - **Frontend**: Netlify (archivos estáticos en carpeta `public`)
 - **Backend**: Render (servidor Node.js con Express)
-- **Base de Datos**: MySQL (tu servidor actual o Railway/PlanetScale)
+- **Base de Datos**: MongoDB Atlas (base de datos en la nube)
 
 ## Paso 1: Desplegar Backend en Render
 
@@ -26,12 +26,11 @@
 5. Agrega las Variables de Entorno (Environment Variables):
    Click en "Advanced" y agrega estas variables desde tu archivo `.env`:
    ```
-   DB_HOST=tu_host_mysql
-   DB_USER=tu_usuario
-   DB_PASSWORD=tu_contraseña
+   MONGODB_URI=tu_connection_string_de_mongodb_atlas
    DB_NAME=biblioteca
-   DB_PORT=3306
-   JWT_SECRET=tu_secreto_jwt
+   JWT_SECRET=tu_secreto_jwt_muy_largo_y_seguro
+   ADMIN_PASSWORD=tu_password_admin
+   NODE_ENV=production
    CLOUDINARY_CLOUD_NAME=tu_cloud_name
    CLOUDINARY_API_KEY=tu_api_key
    CLOUDINARY_API_SECRET=tu_api_secret
@@ -77,12 +76,11 @@ Netlify detectará los cambios en GitHub y redesplegar automáticamente tu front
 ## Problemas Comunes
 
 ### Error CORS
-Si ves errores de CORS, verifica que en `server.js` tengas configurado:
+Si ves errores de CORS, verifica que en `server.js` la URL de Netlify esté en la lista de orígenes permitidos:
 ```javascript
-app.use(cors({
-    origin: 'https://biblioteca-jose-leonardo-ortiz.netlify.app',
-    credentials: true
-}));
+const allowedOrigins = [
+  'https://biblioteca-jose-leonardo-ortiz.netlify.app'
+];
 ```
 
 ### Backend se duerme (Free tier de Render)
@@ -90,8 +88,10 @@ El plan gratuito de Render pone el servicio en "sleep" después de 15 minutos de
 La primera petición puede tardar 30-60 segundos en despertar.
 
 ### Base de datos no conecta
-Verifica que tu servidor MySQL permita conexiones desde la IP de Render.
-Considera usar Railway o PlanetScale para MySQL en la nube.
+Verifica que tu MongoDB Atlas:
+- Tenga configurado el acceso desde cualquier IP (0.0.0.0/0) en Network Access
+- El connection string sea correcto
+- El usuario tenga permisos de lectura/escritura
 
 ## URLs Finales
 

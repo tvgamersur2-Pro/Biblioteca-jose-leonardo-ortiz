@@ -7,9 +7,29 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middlewares
+// Configuración de CORS para permitir peticiones desde Netlify
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
+  'https://biblioteca-jose-leonardo-ortiz.netlify.app'
+];
+
 app.use(cors({
-  origin: process.env.ALLOWED_ORIGINS?.split(',') || '*'
+  origin: function(origin, callback) {
+    // Permitir peticiones sin origin (como Postman o curl)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
+      callback(null, true);
+    } else {
+      callback(new Error('No permitido por CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
