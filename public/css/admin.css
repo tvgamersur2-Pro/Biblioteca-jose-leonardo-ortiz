@@ -28,6 +28,8 @@ body {
     padding: 24px 0;
     overflow-y: auto;
     z-index: 1000;
+    display: flex;
+    flex-direction: column;
 }
 
 .sidebar .brand {
@@ -74,10 +76,9 @@ body {
 }
 
 .logout-link {
-    position: absolute;
-    bottom: 20px;
-    left: 0;
-    right: 0;
+    margin-top: auto;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* MAIN CONTENT */
