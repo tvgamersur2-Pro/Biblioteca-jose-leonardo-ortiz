@@ -7,13 +7,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
     const esAdmin = usuario.perfil === 'Administrador' || usuario.rol === 'admin';
     
-    console.log('Usuario:', usuario);
-    console.log('Es admin:', esAdmin);
+    // Crear overlay para móvil
+    const overlay = document.createElement('div');
+    overlay.className = 'sidebar-overlay';
+    overlay.addEventListener('click', cerrarSidebar);
+    document.body.appendChild(overlay);
+
+    // Crear botón hamburguesa
+    const btnHamburguesa = document.createElement('button');
+    btnHamburguesa.className = 'btn-hamburguesa';
+    btnHamburguesa.innerHTML = '<i class="bi bi-list"></i>';
+    btnHamburguesa.addEventListener('click', toggleSidebar);
+    document.body.appendChild(btnHamburguesa);
     
     sidebar.innerHTML = `
         <div class="brand">
             <h5><i class="bi bi-book-half me-2"></i>Biblioteca</h5>
             <small>Panel de administración</small>
+            <button class="btn-cerrar-sidebar" onclick="cerrarSidebar()">
+                <i class="bi bi-x-lg"></i>
+            </button>
         </div>
         <nav class="nav flex-column mt-3">
             <a class="nav-link ${currentPath === '/dashboard.html' ? 'active' : ''}" href="/dashboard.html">
@@ -53,3 +66,19 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
     `;
 });
+
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.querySelector('.sidebar-overlay');
+    sidebar.classList.toggle('show');
+    overlay.classList.toggle('show');
+    document.body.classList.toggle('sidebar-open');
+}
+
+function cerrarSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.querySelector('.sidebar-overlay');
+    sidebar.classList.remove('show');
+    overlay.classList.remove('show');
+    document.body.classList.remove('sidebar-open');
+}
