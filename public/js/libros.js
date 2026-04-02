@@ -89,7 +89,7 @@ async function cargarLibros(buscar = '') {
     }
 }
 
-// Mostrar libros en tabla
+// Mostrar libros en tabla o grid
 function mostrarLibros() {
     const container = document.getElementById('tablaLibros');
     
@@ -98,7 +98,10 @@ function mostrarLibros() {
         return;
     }
     
-    if (vistaActual === 'tabla') {
+    // En móvil siempre mostrar grid (tarjetas)
+    const esMovil = window.innerWidth <= 768;
+    
+    if (vistaActual === 'tabla' && !esMovil) {
         mostrarVistaTabla(container);
     } else {
         mostrarVistaGrid(container);
