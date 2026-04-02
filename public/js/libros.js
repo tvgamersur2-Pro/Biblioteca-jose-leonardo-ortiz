@@ -98,10 +98,7 @@ function mostrarLibros() {
         return;
     }
     
-    // En móvil siempre mostrar grid (tarjetas)
-    const esMovil = window.innerWidth <= 768;
-    
-    if (vistaActual === 'tabla' && !esMovil) {
+    if (vistaActual === 'tabla') {
         mostrarVistaTabla(container);
     } else {
         mostrarVistaGrid(container);

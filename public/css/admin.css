@@ -378,6 +378,11 @@ body {
         display: none;
     }
 
+    .table-responsive-cards,
+    .table-responsive-cards tbody {
+        display: block;
+    }
+
     .table-responsive-cards tbody tr {
         display: block;
         background: #fff;
@@ -396,6 +401,7 @@ body {
         border: none;
         border-bottom: 1px solid #f0f0f0;
         font-size: 0.88rem;
+        word-break: break-word;
     }
 
     .table-responsive-cards tbody td:last-child {
@@ -408,15 +414,34 @@ body {
     .table-responsive-cards tbody td::before {
         content: attr(data-label);
         font-weight: 600;
-        color: #666;
-        font-size: 0.8rem;
+        color: var(--primary);
+        font-size: 0.78rem;
         text-transform: uppercase;
         margin-right: 12px;
         flex-shrink: 0;
+        min-width: 80px;
     }
 
     .table-responsive-cards tbody td:last-child::before {
         content: none;
+    }
+
+    /* Portada dentro de tarjeta */
+    .table-responsive-cards tbody td[data-label="Portada"] {
+        justify-content: center;
+        border-bottom: none;
+        padding-bottom: 8px;
+    }
+
+    .table-responsive-cards tbody td[data-label="Portada"]::before {
+        display: none;
+    }
+
+    .table-responsive-cards tbody td[data-label="Portada"] img {
+        width: 80px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 6px;
     }
 
     .main-content {
