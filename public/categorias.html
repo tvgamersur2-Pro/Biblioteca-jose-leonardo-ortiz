@@ -35,7 +35,7 @@
                 <button class="btn btn-outline-primary" onclick="buscar()">Buscar</button>
             </div>
 
-            <table class="table table-hover mb-0">
+            <table class="table table-hover mb-0 table-responsive-cards">
                 <thead>
                     <tr><th>Nombre</th><th width="120">Acciones</th></tr>
                 </thead>
@@ -108,7 +108,7 @@
             
             tbody.innerHTML = categorias.map(c => `
                 <tr id="fila-${c._id}">
-                    <td>${escapeHtml(c.nombre)}</td>
+                    <td data-label="Nombre">${escapeHtml(c.nombre)}</td>
                     <td>
                         <button class="btn btn-sm btn-warning" onclick="abrirModal('${c._id}', '${escapeHtml(c.nombre)}')">
                             <i class="bi bi-pencil"></i>

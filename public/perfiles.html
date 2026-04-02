@@ -30,7 +30,7 @@
                 </button>
             </div>
 
-            <table class="table table-hover mb-0">
+            <table class="table table-hover mb-0 table-responsive-cards">
                 <thead>
                     <tr><th>Perfil</th><th>Opciones</th><th>Usuarios</th><th width="120">Acciones</th></tr>
                 </thead>
@@ -120,9 +120,9 @@
             
             tbody.innerHTML = perfiles.map(p => `
                 <tr id="fila-${p._id}">
-                    <td>${escapeHtml(p.nombre)}</td>
-                    <td><span class="badge bg-primary">${p.opciones ? p.opciones.length : 0}</span></td>
-                    <td><span class="badge bg-secondary">0</span></td>
+                    <td data-label="Perfil">${escapeHtml(p.nombre)}</td>
+                    <td data-label="Opciones"><span class="badge bg-primary">${p.opciones ? p.opciones.length : 0}</span></td>
+                    <td data-label="Usuarios"><span class="badge bg-secondary">0</span></td>
                     <td>
                         <button class="btn btn-sm btn-warning" onclick="abrirModal('${p._id}', '${escapeHtml(p.nombre)}')">
                             <i class="bi bi-pencil"></i>

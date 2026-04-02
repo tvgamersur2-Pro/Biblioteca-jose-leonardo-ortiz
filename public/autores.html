@@ -35,7 +35,7 @@
                 <button class="btn btn-outline-primary" onclick="buscar()">Buscar</button>
             </div>
 
-            <table class="table table-hover mb-0">
+            <table class="table table-hover mb-0 table-responsive-cards">
                 <thead>
                     <tr><th>Nombre</th><th width="120">Acciones</th></tr>
                 </thead>
@@ -108,7 +108,7 @@
             
             tbody.innerHTML = autores.map(a => `
                 <tr id="fila-${a._id}">
-                    <td>${escapeHtml(a.nombre)}</td>
+                    <td data-label="Nombre">${escapeHtml(a.nombre)}</td>
                     <td>
                         <button class="btn btn-sm btn-warning" onclick="abrirModal('${a._id}', '${escapeHtml(a.nombre)}')">
                             <i class="bi bi-pencil"></i>

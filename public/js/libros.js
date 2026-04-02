@@ -108,7 +108,7 @@ function mostrarLibros() {
 // Vista Tabla
 function mostrarVistaTabla(container) {
     const html = `
-        <table class="table table-hover mb-0">
+        <table class="table table-hover mb-0 table-responsive-cards">
             <thead>
                 <tr>
                     <th width="80">Portada</th>
@@ -123,7 +123,7 @@ function mostrarVistaTabla(container) {
             <tbody>
                 ${librosData.map(libro => `
                     <tr>
-                        <td>
+                        <td data-label="Portada">
                             ${libro.portada 
                                 ? `<img src="${libro.portada}" class="img-thumbnail" style="width: 60px; height: 80px; object-fit: cover;" alt="Portada">` 
                                 : `<div class="bg-light d-flex align-items-center justify-content-center" style="width: 60px; height: 80px; border-radius: 4px;">
@@ -131,11 +131,11 @@ function mostrarVistaTabla(container) {
                                    </div>`
                             }
                         </td>
-                        <td>${escapeHtml(libro.titulo)}</td>
-                        <td><span class="badge bg-light text-dark">${escapeHtml(libro.codigo)}</span></td>
-                        <td>${escapeHtml(libro.autor || 'Sin autor')}</td>
-                        <td>${escapeHtml(libro.categoria || 'Sin categoría')}</td>
-                        <td>${escapeHtml(libro.estante || 'Sin estante')}</td>
+                        <td data-label="Título">${escapeHtml(libro.titulo)}</td>
+                        <td data-label="Código"><span class="badge bg-light text-dark">${escapeHtml(libro.codigo)}</span></td>
+                        <td data-label="Autor">${escapeHtml(libro.autor || 'Sin autor')}</td>
+                        <td data-label="Categoría">${escapeHtml(libro.categoria || 'Sin categoría')}</td>
+                        <td data-label="Estante">${escapeHtml(libro.estante || 'Sin estante')}</td>
                         <td>
                             <button class="btn btn-sm btn-warning" onclick="editarLibro('${libro._id}')" title="Editar">
                                 <i class="bi bi-pencil"></i>
