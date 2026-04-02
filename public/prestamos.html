@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Préstamos - Biblioteca</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="/css/admin.css" rel="stylesheet">
+    <style>
+        .vencido { background: #fff5f5 !important; }
+        .por-vencer { background: #fffbf0 !important; }
+        
+        /* Estilos para el selector de libros */
+        .libro-item {
+            transition: all 0.2s ease;
+            border: 1px solid transparent !important;
+            margin-bottom: 2px;
+        }
+        
+        .libro-item:hover:not([style*="not-allowed"]) {
+            background-color: #f0f7ff !important;
+            border: 1px solid #0dcaf0 !important;
+            border-radius: 6px;
+        }
+        
+        /* Iconos en selects */
+        #filtroCategoria, #filtroEstante {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23666' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.5rem center;
+            background-size: 12px;
+            padding-right: 2rem;
+        }
+        
+        #listaLibros::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        #listaLibros::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        #listaLibros::-webkit-scrollbar-thumb {
+            background: #e0e0e0;
+            border-radius: 10px;
+        }
+        
+        #listaLibros::-webkit-scrollbar-thumb:hover {
+            background: #bdbdbd;
+        }
+        
+        /* Responsive para móvil */
+        @media (max-width: 768px) {
+            .modal-xl {
+                margin: 0.5rem;
+            }
+            
+            #listaLibros {
+                max-height: 250px !important;
+            }
+            
+            .libro-item .col {
+                font-size: 0.9rem;
+            }
+            
+            .libro-item small {
+                font-size: 0.75rem;
+            }
+            
+            .libro-item .btn-sm {
+                font-size: 0.75rem;
+                padding: 0.25rem 0.5rem;
+            }
+            
+            .pagination {
+                font-size: 0.85rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .modal-xl {
+                margin: 0.25rem;
+            }
+            
+            #listaLibros {
+                max-height: 200px !important;
+            }
+            
+            .libro-item {
+                padding: 0.75rem !important;
+            }
+            
+            .libro-item .badge {
+                font-size: 0.65rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar"></div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="topbar">
+            <h4>Préstamos</h4>
+            <div class="user-badge">
+                <i class="bi bi-person-circle"></i>
+                <span id="nombreUsuario">Usuario</span>
+            </div>
+        </div>
+
+        <div class="card-section">
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                <h6 class="mb-0"><i class="bi bi-journal-bookmark me-2"></i>Gestión de Préstamos</h6>
+                <div class="d-flex gap-2">
+                    <div class="btn-group btn-group-sm">
+                        <button class="btn btn-primary" id="btnActivos" onclick="filtrar('activos')">Activos</button>
+                        <button class="btn btn-outline-primary" id="btnDevueltos" onclick="filtrar('devueltos')">Devueltos</button>
+                        <button class="btn btn-outline-primary" id="btnTodos" onclick="filtrar('todos')">Todos</button>
+                    </div>
+                    <button class="btn btn-primary btn-sm" onclick="abrirModal()">
+                        <i class="bi bi-plus-lg me-1"></i>Nuevo Préstamo
+                    </button>
+                </div>
+            </div>
+
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr><th>Libro</th><th>Alumno</th><th>Grado</th><th>Préstamo</th><th>Devolución</th><th>Estado</th><th width="180">Acciones</th></tr>
+                </thead>
+                <tbody id="tablaPrestamos">
+                    <tr><td colspan="7" class="text-center text-muted">Cargando...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal fade" id="modalPrestamo" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-primary text-white border-0">
+                    <h5 class="modal-title fw-bold">Nuevo Préstamo</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="modalError" class="alert alert-danger d-none"></div>
+                    <form id="formPrestamo">
+                        <input type="hidden" id="inputId" value="">
+                        <input type="hidden" id="inputLibroSeleccionado" value="">
+                        
+                        <!-- Sección: Seleccionar Libro -->
+                        <div class="mb-4">
+                            <h6 class="fw-bold mb-3"><i class="bi bi-book me-2"></i>Seleccionar Libro</h6>
+                            
+                            <!-- Búsqueda -->
+                            <div class="input-group mb-3">
+                                <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                                <input type="text" id="inputBuscarLibro" class="form-control" placeholder="Buscar libro por título, código o autor...">
+                            </div>
+                            
+                            <!-- Filtros -->
+                            <div class="row g-2 mb-3">
+                                <div class="col-md-3 col-6">
+                                    <select id="filtroCategoria" class="form-select form-select-sm">
+                                        <option value=""><i class="bi bi-bookmarks"></i> Todas las categorías</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3 col-6">
+                                    <select id="filtroEstante" class="form-select form-select-sm">
+                                        <option value=""><i class="bi bi-geo-alt"></i> Todos los estantes</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3 col-6">
+                                    <div class="form-check form-switch mt-2">
+                                        <input class="form-check-input" type="checkbox" id="filtroDisponible" checked>
+                                        <label class="form-check-label small" for="filtroDisponible">
+                                            <i class="bi bi-check-circle me-1"></i>Solo disponibles
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-6">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary w-100" onclick="limpiarFiltros()">
+                                        <i class="bi bi-x-circle me-1"></i>Limpiar
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Contador de resultados -->
+                            <div class="alert alert-info py-2 mb-2" id="contadorLibros">
+                                <small><i class="bi bi-info-circle me-1"></i>Cargando libros...</small>
+                            </div>
+                            
+                            <!-- Lista de libros -->
+                            <div id="listaLibros" style="max-height: 320px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 6px; background: #ffffff;">
+                                <div class="text-center py-5">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Cargando...</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Paginación -->
+                            <nav class="mt-2" id="paginacionContainer"></nav>
+                        </div>
+                        
+                        <!-- Sección: Datos del Préstamo -->
+                        <div class="mb-3 mt-4">
+                            <h6 class="fw-bold mb-3"><i class="bi bi-person-badge me-2"></i>Datos del Préstamo</h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold"><i class="bi bi-person me-1"></i>Nombre del alumno</label>
+                                    <input type="text" id="inputAlumno" class="form-control" placeholder="Ej: Juan Pérez García" required>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold"><i class="bi bi-mortarboard me-1"></i>Grado</label>
+                                    <input type="text" id="inputGrado" class="form-control" placeholder="Ej: 3° A">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold"><i class="bi bi-calendar-event me-1"></i>Fecha de devolución</label>
+                                    <input type="date" id="inputFechaDevolucion" class="form-control" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex gap-2 justify-content-end">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-warning" id="btnGuardar">
+                                <i class="bi bi-check-lg me-1"></i>Registrar Préstamo
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/sidebar.js"></script>
+    <script src="/js/modals.js"></script>
+    <script>
+        const API_URL = '/api';
+        const modal = new bootstrap.Modal(document.getElementById('modalPrestamo'));
+        let prestamos = [];
+        let libros = [];
+        let categorias = [];
+        let estantes = [];
+        let filtroActual = 'activos';
+        
+        // Variables para el selector de libros
+        let paginaActual = 1;
+        let totalPaginas = 1;
+        let libroSeleccionado = null;
+        let timeoutBusqueda = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await cargarPrestamos();
+            await cargarCategoriasYEstantes();
+            
+            // Establecer fecha mínima de devolución (hoy)
+            const hoy = new Date().toISOString().split('T')[0];
+            document.getElementById('inputFechaDevolucion').min = hoy;
+            
+            // Event listeners para búsqueda y filtros
+            document.getElementById('inputBuscarLibro').addEventListener('input', () => {
+                clearTimeout(timeoutBusqueda);
+                timeoutBusqueda = setTimeout(() => {
+                    paginaActual = 1;
+                    buscarLibros();
+                }, 300);
+            });
+            
+            document.getElementById('filtroCategoria').addEventListener('change', () => {
+                paginaActual = 1;
+                buscarLibros();
+            });
+            
+            document.getElementById('filtroEstante').addEventListener('change', () => {
+                paginaActual = 1;
+                buscarLibros();
+            });
+            
+            document.getElementById('filtroDisponible').addEventListener('change', () => {
+                paginaActual = 1;
+                buscarLibros();
+            });
+        });
+
+        async function cargarCategoriasYEstantes() {
+            try {
+                const [respCat, respEst] = await Promise.all([
+                    fetchAuth(`${API_URL}/categorias`),
+                    fetchAuth(`${API_URL}/estantes`)
+                ]);
+                
+                if (respCat) categorias = await respCat.json();
+                if (respEst) estantes = await respEst.json();
+                
+                // Llenar selects de filtros
+                const selectCat = document.getElementById('filtroCategoria');
+                selectCat.innerHTML = '<option value="">Todas las categorías</option>' +
+                    categorias.map(c => `<option value="${c._id}">${escapeHtml(c.nombre)}</option>`).join('');
+                
+                const selectEst = document.getElementById('filtroEstante');
+                selectEst.innerHTML = '<option value="">Todos los estantes</option>' +
+                    estantes.map(e => `<option value="${e._id}">${escapeHtml(e.numero)}</option>`).join('');
+            } catch (error) {
+                console.error('Error al cargar categorías y estantes:', error);
+            }
+        }
+
+        async function buscarLibros() {
+            try {
+                const buscar = document.getElementById('inputBuscarLibro').value.trim();
+                const categoria = document.getElementById('filtroCategoria').value;
+                const estante = document.getElementById('filtroEstante').value;
+                const disponible = document.getElementById('filtroDisponible').checked;
+                
+                const params = new URLSearchParams({
+                    buscar,
+                    categoria,
+                    estante,
+                    disponible: disponible ? 'true' : '',
+                    pagina: paginaActual,
+                    limite: 8
+                });
+                
+                const response = await fetchAuth(`${API_URL}/libros/buscar?${params}`);
+                if (!response) return;
+                
+                const data = await response.json();
+                libros = data.libros;
+                totalPaginas = data.totalPaginas;
+                
+                mostrarLibros(data);
+                mostrarPaginacion(data);
+            } catch (error) {
+                console.error('Error al buscar libros:', error);
+                document.getElementById('listaLibros').innerHTML = '<div class="text-center text-danger py-3">Error al cargar libros</div>';
+            }
+        }
+
+        function mostrarLibros(data) {
+            const container = document.getElementById('listaLibros');
+            const contador = document.getElementById('contadorLibros');
+            
+            contador.innerHTML = `<small><i class="bi bi-info-circle me-1"></i>Mostrando ${data.libros.length} de ${data.total} libros</small>`;
+            
+            if (data.libros.length === 0) {
+                container.innerHTML = '<div class="text-center text-muted py-4"><i class="bi bi-inbox" style="font-size: 2rem;"></i><p class="mt-2">No se encontraron libros</p></div>';
+                return;
+            }
+            
+            container.innerHTML = data.libros.map(libro => {
+                const seleccionado = libroSeleccionado && libroSeleccionado._id === libro._id;
+                const disponible = libro.disponible;
+                
+                return `
+                    <div class="libro-item p-3 ${seleccionado ? 'bg-primary bg-opacity-10 border-primary border-2' : 'bg-white'}" 
+                         style="cursor: ${disponible ? 'pointer' : 'not-allowed'};"
+                         onclick="${disponible ? `seleccionarLibro('${libro._id}')` : ''}">
+                        <div class="row align-items-center">
+                            <div class="col-auto d-none d-md-block">
+                                ${libro.portada 
+                                    ? `<img src="${libro.portada}" class="rounded" style="width: 50px; height: 65px; object-fit: cover;" alt="Portada">` 
+                                    : `<div class="bg-secondary bg-opacity-25 rounded d-flex align-items-center justify-content-center" style="width: 50px; height: 65px;">
+                                        <i class="bi bi-book text-muted"></i>
+                                       </div>`
+                                }
+                            </div>
+                            <div class="col">
+                                <div class="fw-bold text-truncate"><i class="bi bi-book-fill me-1 text-primary"></i>${escapeHtml(libro.titulo)}</div>
+                                <small class="text-muted d-block"><i class="bi bi-person me-1"></i>${escapeHtml(libro.autor || 'Sin autor')}</small>
+                                <small class="text-muted">
+                                    <span class="badge bg-light text-dark"><i class="bi bi-upc me-1"></i>${escapeHtml(libro.codigo)}</span>
+                                    <span class="ms-2"><i class="bi bi-tag me-1"></i>${escapeHtml(libro.categoria || 'Sin categoría')}</span>
+                                    <span class="ms-2"><i class="bi bi-geo-alt me-1"></i>${escapeHtml(libro.estante || 'Sin estante')}</span>
+                                </small>
+                            </div>
+                            <div class="col-auto">
+                                ${disponible 
+                                    ? `<div>
+                                        <span class="badge bg-success mb-1 d-block"><i class="bi bi-check-circle me-1"></i>Disponible</span>
+                                        ${seleccionado 
+                                            ? '<button class="btn btn-success btn-sm w-100" disabled><i class="bi bi-check-lg me-1"></i>Seleccionado</button>'
+                                            : '<button class="btn btn-primary btn-sm w-100"><i class="bi bi-hand-index me-1"></i>Seleccionar</button>'
+                                        }
+                                       </div>`
+                                    : `<div>
+                                        <span class="badge bg-danger mb-1 d-block"><i class="bi bi-x-circle me-1"></i>Prestado</span>
+                                        <button class="btn btn-secondary btn-sm w-100" disabled><i class="bi bi-lock me-1"></i>No disponible</button>
+                                       </div>`
+                                }
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function mostrarPaginacion(data) {
+            const container = document.getElementById('paginacionContainer');
+            
+            if (data.totalPaginas <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+            
+            let html = '<ul class="pagination pagination-sm justify-content-center mb-0">';
+            
+            // Botón anterior
+            html += `<li class="page-item ${paginaActual === 1 ? 'disabled' : ''}">
+                <a class="page-link" href="#" onclick="cambiarPagina(${paginaActual - 1}); return false;">
+                    <i class="bi bi-chevron-left"></i>
+                </a>
+            </li>`;
+            
+            // Páginas
+            const maxPaginas = 5;
+            let inicio = Math.max(1, paginaActual - Math.floor(maxPaginas / 2));
+            let fin = Math.min(data.totalPaginas, inicio + maxPaginas - 1);
+            
+            if (fin - inicio < maxPaginas - 1) {
+                inicio = Math.max(1, fin - maxPaginas + 1);
+            }
+            
+            if (inicio > 1) {
+                html += `<li class="page-item"><a class="page-link" href="#" onclick="cambiarPagina(1); return false;">1</a></li>`;
+                if (inicio > 2) html += '<li class="page-item disabled"><span class="page-link">...</span></li>';
+            }
+            
+            for (let i = inicio; i <= fin; i++) {
+                html += `<li class="page-item ${i === paginaActual ? 'active' : ''}">
+                    <a class="page-link" href="#" onclick="cambiarPagina(${i}); return false;">${i}</a>
+                </li>`;
+            }
+            
+            if (fin < data.totalPaginas) {
+                if (fin < data.totalPaginas - 1) html += '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                html += `<li class="page-item"><a class="page-link" href="#" onclick="cambiarPagina(${data.totalPaginas}); return false;">${data.totalPaginas}</a></li>`;
+            }
+            
+            // Botón siguiente
+            html += `<li class="page-item ${paginaActual === data.totalPaginas ? 'disabled' : ''}">
+                <a class="page-link" href="#" onclick="cambiarPagina(${paginaActual + 1}); return false;">
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </li>`;
+            
+            html += '</ul>';
+            container.innerHTML = html;
+        }
+
+        function cambiarPagina(pagina) {
+            if (pagina < 1 || pagina > totalPaginas) return;
+            paginaActual = pagina;
+            buscarLibros();
+        }
+
+        function seleccionarLibro(id) {
+            libroSeleccionado = libros.find(l => l._id === id);
+            if (libroSeleccionado) {
+                document.getElementById('inputLibroSeleccionado').value = id;
+                buscarLibros(); // Refrescar para mostrar selección
+            }
+        }
+
+        function limpiarFiltros() {
+            document.getElementById('inputBuscarLibro').value = '';
+            document.getElementById('filtroCategoria').value = '';
+            document.getElementById('filtroEstante').value = '';
+            document.getElementById('filtroDisponible').checked = true;
+            paginaActual = 1;
+            buscarLibros();
+        }
+
+        async function cargarPrestamos() {
+            try {
+                const response = await fetchAuth(`${API_URL}/prestamos?filtro=${filtroActual}`);
+                if (!response) return;
+                
+                prestamos = await response.json();
+                mostrarPrestamos();
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('tablaPrestamos').innerHTML = '<tr><td colspan="7" class="text-center text-danger">Error al cargar préstamos</td></tr>';
+            }
+        }
+
+        function mostrarPrestamos() {
+            const tbody = document.getElementById('tablaPrestamos');
+            if (prestamos.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No hay préstamos registrados</td></tr>';
+                return;
+            }
+            
+            const hoy = new Date().toISOString().split('T')[0];
+            
+            tbody.innerHTML = prestamos.map(p => {
+                const vencido = !p.devuelto && p.fecha_devolucion < hoy;
+                const porVencer = !p.devuelto && p.fecha_devolucion === hoy;
+                const rowClass = vencido ? 'vencido' : (porVencer ? 'por-vencer' : '');
+                
+                let estadoBadge = '';
+                if (p.devuelto) {
+                    estadoBadge = '<span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Devuelto</span>';
+                } else if (vencido) {
+                    estadoBadge = '<span class="badge bg-danger"><i class="bi bi-exclamation-circle me-1"></i>Vencido</span>';
+                } else if (porVencer) {
+                    estadoBadge = '<span class="badge bg-warning text-dark"><i class="bi bi-clock me-1"></i>Vence hoy</span>';
+                } else {
+                    estadoBadge = '<span class="badge bg-info text-dark"><i class="bi bi-hourglass-split me-1"></i>Activo</span>';
+                }
+                
+                return `
+                    <tr class="${rowClass}" id="fila-${p._id}">
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="bg-primary bg-opacity-10 rounded p-2 me-2">
+                                    <i class="bi bi-book-fill text-primary"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-semibold" style="font-size:.9rem">${escapeHtml(p.titulo)}</div>
+                                    <small class="text-muted"><i class="bi bi-upc me-1"></i>${escapeHtml(p.codigo)}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <i class="bi bi-person me-1 text-muted"></i>${escapeHtml(p.nombre_alumno)}
+                        </td>
+                        <td>
+                            <i class="bi bi-mortarboard me-1 text-muted"></i>${escapeHtml(p.grado || '—')}
+                        </td>
+                        <td>
+                            <i class="bi bi-calendar-check me-1 text-muted"></i>${formatearFecha(p.fecha_prestamo)}
+                        </td>
+                        <td>
+                            <i class="bi bi-calendar-event me-1 text-muted"></i>${formatearFecha(p.fecha_devolucion)}
+                        </td>
+                        <td>${estadoBadge}</td>
+                        <td>
+                            ${!p.devuelto ? `
+                            <button class="btn btn-sm btn-success me-1" onclick="devolver('${p._id}')" title="Marcar como devuelto">
+                                <i class="bi bi-check-lg me-1"></i><span class="d-none d-md-inline">Devolver</span>
+                            </button>
+                            ` : ''}
+                            <button class="btn btn-sm btn-danger" onclick="eliminar('${p._id}')" title="Eliminar préstamo">
+                                <i class="bi bi-trash me-1"></i><span class="d-none d-md-inline">Eliminar</span>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function filtrar(tipo) {
+            filtroActual = tipo;
+            
+            // Actualizar botones
+            document.getElementById('btnActivos').className = tipo === 'activos' ? 'btn btn-primary' : 'btn btn-outline-primary';
+            document.getElementById('btnDevueltos').className = tipo === 'devueltos' ? 'btn btn-primary' : 'btn btn-outline-primary';
+            document.getElementById('btnTodos').className = tipo === 'todos' ? 'btn btn-primary' : 'btn btn-outline-primary';
+            
+            cargarPrestamos();
+        }
+
+        function abrirModal() {
+            document.getElementById('inputId').value = '';
+            document.getElementById('inputLibroSeleccionado').value = '';
+            document.getElementById('inputAlumno').value = '';
+            document.getElementById('inputGrado').value = '';
+            document.getElementById('inputFechaDevolucion').value = '';
+            document.getElementById('modalError').classList.add('d-none');
+            
+            // Resetear selector de libros
+            libroSeleccionado = null;
+            paginaActual = 1;
+            document.getElementById('inputBuscarLibro').value = '';
+            document.getElementById('filtroCategoria').value = '';
+            document.getElementById('filtroEstante').value = '';
+            document.getElementById('filtroDisponible').checked = true;
+            
+            modal.show();
+            
+            // Cargar libros después de mostrar el modal
+            setTimeout(() => buscarLibros(), 100);
+        }
+
+        document.getElementById('formPrestamo').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnGuardar');
+            btn.disabled = true;
+            
+            const id = document.getElementById('inputId').value;
+            const id_libro = document.getElementById('inputLibroSeleccionado').value;
+            const nombre_alumno = document.getElementById('inputAlumno').value.trim();
+            const grado = document.getElementById('inputGrado').value.trim();
+            const fecha_devolucion = document.getElementById('inputFechaDevolucion').value;
+            
+            if (!id_libro) {
+                const err = document.getElementById('modalError');
+                err.textContent = 'Debes seleccionar un libro';
+                err.classList.remove('d-none');
+                btn.disabled = false;
+                return;
+            }
+            
+            try {
+                const url = id ? `${API_URL}/prestamos/${id}` : `${API_URL}/prestamos`;
+                const method = id ? 'PUT' : 'POST';
+                
+                const response = await fetchAuth(url, {
+                    method,
+                    body: JSON.stringify({ id_libro, nombre_alumno, grado, fecha_devolucion })
+                });
+                
+                if (!response) {
+                    btn.disabled = false;
+                    return;
+                }
+                
+                if (response.ok) {
+                    modal.hide();
+                    cargarPrestamos();
+                } else {
+                    const data = await response.json();
+                    const err = document.getElementById('modalError');
+                    err.textContent = data.error || 'Error al guardar';
+                    err.classList.remove('d-none');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                const err = document.getElementById('modalError');
+                err.textContent = 'Error al guardar';
+                err.classList.remove('d-none');
+            }
+            
+            btn.disabled = false;
+        });
+
+        async function devolver(id) {
+            if (!await confirmar('¿Marcar como devuelto?', 'Confirmar devolución')) return;
+            
+            try {
+                const response = await fetchAuth(`${API_URL}/prestamos/${id}/devolver`, {
+                    method: 'PATCH'
+                });
+                
+                if (!response) return;
+                
+                if (response.ok) {
+                    cargarPrestamos();
+                } else {
+                    const data = await response.json();
+                    await alerta(data.error || 'Error al marcar como devuelto', 'Error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                await alerta('Error al marcar como devuelto', 'Error');
+            }
+        }
+
+        async function eliminar(id) {
+            if (!await confirmar('¿Eliminar este préstamo?', 'Confirmar eliminación')) return;
+            
+            try {
+                const response = await fetchAuth(`${API_URL}/prestamos/${id}`, {
+                    method: 'DELETE'
+                });
+                
+                if (!response) return;
+                
+                if (response.ok) {
+                    cargarPrestamos();
+                } else {
+                    const data = await response.json();
+                    await alerta(data.error || 'Error al eliminar', 'Error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                await alerta('Error al eliminar', 'Error');
+            }
+        }
+
+        function formatearFecha(fecha) {
+            if (!fecha) return '—';
+            const d = new Date(fecha);
+            return d.toLocaleDateString('es-PE');
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>

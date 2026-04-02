@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Biblioteca Escolar "José Leonardo Ortiz"</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="/css/styles.css" rel="stylesheet">
+</head>
+<body>
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <img src="/imagenes/logocole.jpeg" alt="Logo">
+                Biblioteca "José Leonardo Ortiz"
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+                <i class="bi bi-list text-white fs-4"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navMenu">
+                <ul class="navbar-nav ms-auto align-items-center gap-1">
+                    <li class="nav-item"><a class="nav-link" href="#catalogo">Catálogo</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#recursos">Recursos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#horario">Horario</a></li>
+                    <li class="nav-item ms-2">
+                        <a class="nav-link btn-login" href="/login.html">
+                            <i class="bi bi-person-circle me-1"></i>Iniciar sesión
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="container">
+            <h1>Encuentra tu próximo libro</h1>
+            <p>Accede al catálogo de la Biblioteca Escolar y descubre miles de títulos disponibles para ti.</p>
+            <div class="search-box">
+                <input type="text" id="inputBuscar" placeholder="Buscar por título o código…">
+                <button onclick="buscar()"><i class="bi bi-search me-1"></i>Buscar</button>
+            </div>
+            <div id="resultados"></div>
+        </div>
+    </section>
+
+    <!-- STATS -->
+    <div class="stats">
+        <div class="container">
+            <div class="row justify-content-center g-4">
+                <div class="col-6 col-md-3">
+                    <div class="stat-item">
+                        <div class="num" id="totalLibros">0</div>
+                        <div class="lbl">Libros disponibles</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="stat-item">
+                        <div class="num" id="totalAutores">0</div>
+                        <div class="lbl">Autores</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="stat-item">
+                        <div class="num" id="totalCategorias">0</div>
+                        <div class="lbl">Categorías</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="stat-item">
+                        <div class="num">5</div>
+                        <div class="lbl">Días de atención</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CATÁLOGO DE LIBROS -->
+    <section class="section bg-white" id="catalogo">
+        <div class="container">
+            <div class="section-title"><i class="bi bi-book me-2"></i>Catálogo de Libros</div>
+            <p class="section-sub">Explora nuestra colección de libros disponibles</p>
+            
+            <!-- Barra de búsqueda del catálogo -->
+            <div class="catalogo-search mb-4">
+                <input type="text" id="inputBuscarCatalogo" placeholder="Buscar libros por título, autor o código...">
+                <button onclick="buscarCatalogo()"><i class="bi bi-search"></i></button>
+            </div>
+            
+            <!-- Grid de tarjetas de libros -->
+            <div id="catalogoLibros" class="row g-4">
+                <div class="col-12 text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                    <p class="mt-3 text-muted">Cargando libros...</p>
+                </div>
+            </div>
+            
+            <!-- Paginación -->
+            <div id="paginacion" class="d-flex justify-content-center mt-4"></div>
+        </div>
+    </section>
+
+    <!-- RECURSOS DIGITALES -->
+    <section class="section bg-white" id="recursos">
+        <div class="container">
+            <div class="section-title"><i class="bi bi-globe me-2"></i>Recursos Digitales</div>
+            <p class="section-sub">Plataformas y bibliotecas digitales recomendadas</p>
+            <div class="row g-3 mb-3">
+                <div class="col-6 col-md-3">
+                    <a href="https://www.bnp.gob.pe/" target="_blank" class="recurso-card">
+                        <img src="https://cdn-icons-png.flaticon.com/512/29/29302.png" alt="BNP">
+                        <span>Biblioteca Nacional del Perú</span>
+                    </a>
+                </div>
+                <div class="col-6 col-md-3">
+                    <a href="https://www.perueduca.pe/" target="_blank" class="recurso-card">
+                        <img src="https://cdn-icons-png.flaticon.com/512/2995/2995620.png" alt="PerúEduca">
+                        <span>PerúEduca</span>
+                    </a>
+                </div>
+                <div class="col-6 col-md-3">
+                    <a href="https://recursos.perueduca.pe/" target="_blank" class="recurso-card">
+                        <img src="https://cdn-icons-png.flaticon.com/512/1903/1903162.png" alt="Biblioteca Digital">
+                        <span>Biblioteca Escolar Digital</span>
+                    </a>
+                </div>
+                <div class="col-6 col-md-3">
+                    <a href="https://educapeques.com/" target="_blank" class="recurso-card">
+                        <img src="https://cdn-icons-png.flaticon.com/512/3976/3976625.png" alt="Educapeques">
+                        <span>Educapeques</span>
+                    </a>
+                </div>
+            </div>
+            <div class="row g-3">
+                <div class="col-6 col-md-3">
+                    <a href="https://es.khanacademy.org/" target="_blank" class="recurso-card">
+                        <img src="https://cdn-icons-png.flaticon.com/512/3176/3176361.png" alt="Khan Academy">
+                        <span>Khan Academy</span>
+                    </a>
+                </div>
+                <div class="col-6 col-md-3">
+                    <a href="https://www.didactalia.net/" target="_blank" class="recurso-card">
+                        <img src="https://cdn-icons-png.flaticon.com/512/3976/3976631.png" alt="Didactalia">
+                        <span>Didactalia.net</span>
+                    </a>
+                </div>
+                <div class="col-6 col-md-3">
+                    <a href="https://drive.google.com/" target="_blank" class="recurso-card">
+                        <img src="https://cdn-icons-png.flaticon.com/512/5968/5968523.png" alt="Google Drive">
+                        <span>Google Drive Institucional</span>
+                    </a>
+                </div>
+                <div class="col-6 col-md-3">
+                    <a href="https://www.bnp.gob.pe/biblioteca-digital/" target="_blank" class="recurso-card">
+                        <img src="https://cdn-icons-png.flaticon.com/512/2232/2232688.png" alt="BNP Digital">
+                        <span>Biblioteca Digital BNP</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- HORARIO Y CONTACTO -->
+    <section class="section" id="horario">
+        <div class="container">
+            <div class="row g-4 align-items-center">
+                <div class="col-md-6">
+                    <div class="section-title"><i class="bi bi-clock me-2"></i>Horario de Atención</div>
+                    <p class="section-sub">Estamos disponibles para ayudarte</p>
+                    <div class="horario-card">
+                        <h5><i class="bi bi-calendar3 me-2"></i>Horario semanal</h5>
+                        <div class="horario-item"><span>Lunes a Viernes</span><span>7:00 a.m. – 9:00 p.m.</span></div>
+                        <div class="horario-item"><span>Sábado</span><span>8:00 a.m. – 6:00 p.m.</span></div>
+                        <div class="horario-item"><span>Domingo</span><span>Cerrado</span></div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="section-title"><i class="bi bi-envelope me-2"></i>Contacto</div>
+                    <p class="section-sub">¿Tienes alguna consulta? Escríbenos</p>
+                    <div class="d-flex flex-column gap-3">
+                        <div class="d-flex align-items-center gap-3 bg-white rounded-3 p-3 shadow-sm">
+                            <i class="bi bi-envelope-fill fs-4 text-primary"></i>
+                            <div>
+                                <div class="fw-semibold" style="font-size:.85rem;color:#888">Correo</div>
+                                <a href="mailto:biblioteca@jlo.edu.pe" style="color:#1a3a5c;font-weight:600">biblioteca@jlo.edu.pe</a>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center gap-3 bg-white rounded-3 p-3 shadow-sm">
+                            <i class="bi bi-whatsapp fs-4 text-success"></i>
+                            <div>
+                                <div class="fw-semibold" style="font-size:.85rem;color:#888">WhatsApp</div>
+                                <span style="color:#1a3a5c;font-weight:600">+51 9XX XXX XXX</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <p>© <span id="year"></span> Biblioteca Escolar "José Leonardo Ortiz" — Todos los derechos reservados</p>
+            <p class="mt-1"><a href="/login.html">Acceso administrativo</a></p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/public.js"></script>
+</body>
+</html>

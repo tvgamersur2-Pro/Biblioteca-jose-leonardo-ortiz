@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Estantes - Biblioteca</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="/css/admin.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar"></div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="topbar">
+            <h4>Estantes</h4>
+            <div class="user-badge">
+                <i class="bi bi-person-circle"></i>
+                <span id="nombreUsuario">Usuario</span>
+            </div>
+        </div>
+
+        <div class="card-section">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="mb-0"><i class="bi bi-archive me-2"></i>Listado de Estantes</h6>
+                <button class="btn btn-primary btn-sm" onclick="abrirModal()">
+                    <i class="bi bi-plus-lg me-1"></i>Nuevo Estante
+                </button>
+            </div>
+
+            <div class="d-flex mb-3">
+                <input class="form-control me-2" type="search" id="inputBuscar" placeholder="Buscar estante...">
+                <button class="btn btn-outline-primary" onclick="buscar()">Buscar</button>
+            </div>
+
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr><th>Número</th><th width="120">Acciones</th></tr>
+                </thead>
+                <tbody id="tablaEstantes">
+                    <tr><td colspan="2" class="text-center text-muted">Cargando...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal fade" id="modalEstante" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold" id="modalTitulo">Nuevo Estante</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="modalError" class="alert alert-danger d-none"></div>
+                    <form id="formEstante">
+                        <input type="hidden" id="inputId" value="">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Número / Nombre</label>
+                            <input type="text" id="inputNumero" class="form-control" required>
+                        </div>
+                        <div class="d-flex gap-2 justify-content-end">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary" id="btnGuardar">Guardar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/sidebar.js"></script>
+    <script src="/js/modals.js"></script>
+    <script>
+        const API_URL = '/api';
+        const modal = new bootstrap.Modal(document.getElementById('modalEstante'));
+        let estantes = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            cargarEstantes();
+        });
+
+        async function cargarEstantes(busqueda = '') {
+            try {
+                const url = busqueda ? `${API_URL}/estantes?buscar=${encodeURIComponent(busqueda)}` : `${API_URL}/estantes`;
+                const response = await fetchAuth(url);
+                if (!response) return;
+                
+                estantes = await response.json();
+                mostrarEstantes();
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('tablaEstantes').innerHTML = '<tr><td colspan="2" class="text-center text-danger">Error al cargar estantes</td></tr>';
+            }
+        }
+
+        function mostrarEstantes() {
+            const tbody = document.getElementById('tablaEstantes');
+            if (estantes.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="2" class="text-center text-muted">No se encontraron resultados</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = estantes.map(e => `
+                <tr id="fila-${e._id}">
+                    <td>${escapeHtml(e.numero)}</td>
+                    <td>
+                        <button class="btn btn-sm btn-warning" onclick="abrirModal('${e._id}', '${escapeHtml(e.numero)}')">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="eliminar('${e._id}')">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function buscar() {
+            const busqueda = document.getElementById('inputBuscar').value;
+            cargarEstantes(busqueda);
+        }
+
+        function abrirModal(id = '', numero = '') {
+            document.getElementById('modalTitulo').textContent = id ? 'Editar Estante' : 'Nuevo Estante';
+            document.getElementById('inputId').value = id;
+            document.getElementById('inputNumero').value = numero;
+            document.getElementById('modalError').classList.add('d-none');
+            document.getElementById('btnGuardar').textContent = id ? 'Actualizar' : 'Guardar';
+            modal.show();
+            setTimeout(() => document.getElementById('inputNumero').focus(), 300);
+        }
+
+        document.getElementById('formEstante').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnGuardar');
+            btn.disabled = true;
+            
+            const id = document.getElementById('inputId').value;
+            const numero = document.getElementById('inputNumero').value.trim();
+            
+            try {
+                const url = id ? `${API_URL}/estantes/${id}` : `${API_URL}/estantes`;
+                const method = id ? 'PUT' : 'POST';
+                
+                const response = await fetchAuth(url, {
+                    method,
+                    body: JSON.stringify({ numero })
+                });
+                
+                if (!response) {
+                    btn.disabled = false;
+                    return;
+                }
+                
+                if (response.ok) {
+                    modal.hide();
+                    cargarEstantes();
+                } else {
+                    const data = await response.json();
+                    const err = document.getElementById('modalError');
+                    err.textContent = data.error || 'Error al guardar';
+                    err.classList.remove('d-none');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                const err = document.getElementById('modalError');
+                err.textContent = 'Error al guardar';
+                err.classList.remove('d-none');
+            }
+            
+            btn.disabled = false;
+        });
+
+        async function eliminar(id) {
+            if (!await confirmar('¿Eliminar este estante?', 'Confirmar eliminación')) return;
+            
+            try {
+                const response = await fetchAuth(`${API_URL}/estantes/${id}`, {
+                    method: 'DELETE'
+                });
+                
+                if (!response) return;
+                
+                if (response.ok) {
+                    cargarEstantes();
+                } else {
+                    const data = await response.json();
+                    await alerta(data.error || 'No se puede eliminar, tiene libros asociados.', 'Error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                await alerta('Error al eliminar', 'Error');
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>

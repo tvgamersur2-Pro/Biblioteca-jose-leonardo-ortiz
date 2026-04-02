@@ -1,0 +1,108 @@
+═══════════════════════════════════════════════════════════════
+  COMANDOS PARA EJECUTAR EN TU TERMINAL
+  Copia y pega estos comandos UNO POR UNO
+═══════════════════════════════════════════════════════════════
+
+PASO 1: LIMPIAR CONFIGURACIÓN ANTERIOR DE GIT
+─────────────────────────────────────────────────────────────
+
+git config --global --unset credential.helper
+
+git config --global user.name "tvgamersur2-Pro"
+
+git config --global user.email "tvgamersur2@gmail.com"
+
+
+PASO 2: VERIFICAR CONFIGURACIÓN
+─────────────────────────────────────────────────────────────
+
+git config --global --list
+
+
+PASO 3: AGREGAR ARCHIVOS AL REPOSITORIO
+─────────────────────────────────────────────────────────────
+
+git add .
+
+
+PASO 4: VER QUÉ ARCHIVOS SE VAN A SUBIR
+─────────────────────────────────────────────────────────────
+
+git status
+
+
+PASO 5: HACER EL PRIMER COMMIT
+─────────────────────────────────────────────────────────────
+
+git commit -m "Initial commit - Sistema Biblioteca IE"
+
+
+PASO 6: CONECTAR CON TU NUEVO REPOSITORIO
+─────────────────────────────────────────────────────────────
+
+git remote add origin https://github.com/tvgamersur2-Pro/IE-Biblioteca.git
+
+
+PASO 7: VERIFICAR QUE SE AGREGÓ CORRECTAMENTE
+─────────────────────────────────────────────────────────────
+
+git remote -v
+
+
+PASO 8: CAMBIAR A RAMA MAIN
+─────────────────────────────────────────────────────────────
+
+git branch -M main
+
+
+PASO 9: SUBIR EL CÓDIGO A GITHUB
+─────────────────────────────────────────────────────────────
+
+git push -u origin main
+
+
+═══════════════════════════════════════════════════════════════
+  CUANDO TE PIDA CREDENCIALES
+═══════════════════════════════════════════════════════════════
+
+Username: tvgamersur2-Pro
+
+Password: [PEGA TU NUEVO TOKEN AQUÍ]
+
+IMPORTANTE: 
+- NO uses el token que compartiste antes (ya debe estar revocado)
+- Genera un nuevo token en: https://github.com/settings/tokens
+- El token debe tener permisos de "repo"
+
+
+═══════════════════════════════════════════════════════════════
+  SI YA TENÍAS UN REMOTE CONFIGURADO (ERROR)
+═══════════════════════════════════════════════════════════════
+
+Si te sale error "remote origin already exists", ejecuta:
+
+git remote remove origin
+
+Luego vuelve a ejecutar el PASO 6
+
+
+═══════════════════════════════════════════════════════════════
+  VERIFICAR QUE SE SUBIÓ
+═══════════════════════════════════════════════════════════════
+
+Ve a: https://github.com/tvgamersur2-Pro/IE-Biblioteca
+
+Deberías ver todos tus archivos.
+
+
+═══════════════════════════════════════════════════════════════
+  NOTA SOBRE EL ERROR DE TERMINAL
+═══════════════════════════════════════════════════════════════
+
+El error "Starting directory does not exist" es porque VS Code
+está buscando una carpeta duplicada: IE-Bliblioteca\IE-Bliblioteca
+
+Para arreglarlo:
+1. Cierra VS Code
+2. Abre VS Code directamente en: D:\P01-ING-SW\SISTEMA DE BRYAN\IE-Bliblioteca
+3. O usa: File → Open Folder → Selecciona IE-Bliblioteca

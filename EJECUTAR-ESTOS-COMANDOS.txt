@@ -1,0 +1,138 @@
+═══════════════════════════════════════════════════════════════
+  COMANDOS PARA SUBIR TU PROYECTO A GITHUB
+  Ejecuta estos comandos EN ORDEN en tu terminal
+═══════════════════════════════════════════════════════════════
+
+PASO 1: CONFIGURAR GIT CON TU CUENTA
+─────────────────────────────────────────────────────────────
+
+git config --global user.name "tvgamersur2-Pro"
+
+git config --global user.email "tvgamersur2@gmail.com"
+
+git config --global --list
+
+
+PASO 2: NAVEGAR A TU PROYECTO
+─────────────────────────────────────────────────────────────
+
+cd "d:/P01-ING-SW/SISTEMA DE BRYAN/IE-Bliblioteca"
+
+
+PASO 3: INICIALIZAR GIT (si no está inicializado)
+─────────────────────────────────────────────────────────────
+
+git init
+
+git status
+
+
+PASO 4: AGREGAR ARCHIVOS Y HACER COMMIT
+─────────────────────────────────────────────────────────────
+
+git add .
+
+git commit -m "Initial commit - Sistema Biblioteca IE"
+
+
+PASO 5: CONECTAR CON GITHUB
+─────────────────────────────────────────────────────────────
+
+git remote add origin https://github.com/tvgamersur2-Pro/Biblioteca-IE.git
+
+git branch -M main
+
+
+PASO 6: SUBIR EL CÓDIGO
+─────────────────────────────────────────────────────────────
+
+git push -u origin main
+
+
+═══════════════════════════════════════════════════════════════
+  IMPORTANTE: AUTENTICACIÓN
+═══════════════════════════════════════════════════════════════
+
+Cuando te pida credenciales:
+
+Usuario: tvgamersur2-Pro
+Contraseña: [NECESITAS UN TOKEN DE ACCESO PERSONAL]
+
+CÓMO OBTENER EL TOKEN:
+
+1. Ve a: https://github.com/settings/tokens
+
+2. Click en "Generate new token" → "Generate new token (classic)"
+
+3. Nombre del token: Biblioteca-IE-Token
+
+4. Selecciona el checkbox: "repo" (todos los permisos)
+
+5. Click en "Generate token"
+
+6. COPIA EL TOKEN (solo se muestra una vez)
+
+7. Cuando Git pida "Password", pega el TOKEN (no tu contraseña)
+
+
+═══════════════════════════════════════════════════════════════
+  VERIFICAR QUE SE SUBIÓ CORRECTAMENTE
+═══════════════════════════════════════════════════════════════
+
+Ve a: https://github.com/tvgamersur2-Pro/Biblioteca-IE
+
+Deberías ver todos tus archivos EXCEPTO:
+- node_modules/
+- .env
+- *.log
+
+
+═══════════════════════════════════════════════════════════════
+  COMANDOS PARA ACTUALIZACIONES FUTURAS
+═══════════════════════════════════════════════════════════════
+
+Cuando hagas cambios en tu código:
+
+git add .
+
+git commit -m "Descripción de los cambios"
+
+git push
+
+
+═══════════════════════════════════════════════════════════════
+  SIGUIENTE PASO: DESPLEGAR EN RENDER.COM
+═══════════════════════════════════════════════════════════════
+
+1. Ve a: https://render.com
+
+2. Regístrate con tu cuenta de GitHub
+
+3. Click en "New +" → "Web Service"
+
+4. Selecciona el repositorio: Biblioteca-IE
+
+5. Configuración:
+   Name: biblioteca-ie
+   Runtime: Node
+   Build Command: npm install
+   Start Command: npm start
+   Instance Type: Free
+
+6. Agrega las variables de entorno (ver GUIA-DESPLIEGUE-NETLIFY.md)
+
+7. Click en "Create Web Service"
+
+8. Espera 5-10 minutos
+
+9. Tu app estará en: https://biblioteca-ie.onrender.com
+
+
+═══════════════════════════════════════════════════════════════
+  ¿NECESITAS AYUDA?
+═══════════════════════════════════════════════════════════════
+
+Si algo falla, dime:
+- ¿Qué comando ejecutaste?
+- ¿Qué error te salió?
+- Copia el mensaje de error completo

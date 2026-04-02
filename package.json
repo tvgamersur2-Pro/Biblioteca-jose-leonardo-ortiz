@@ -1,0 +1,34 @@
+{
+  "name": "biblioteca-ie-nodejs",
+  "version": "1.0.0",
+  "description": "Sistema de Biblioteca IE migrado a Node.js + MongoDB",
+  "main": "server.js",
+  "scripts": {
+    "dev": "nodemon server.js",
+    "start": "node server.js",
+    "init-db": "node init-db.js",
+    "test-connection": "node test-connection.js"
+  },
+  "keywords": [
+    "biblioteca",
+    "nodejs",
+    "mongodb",
+    "express"
+  ],
+  "author": "tvgamersur2",
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cloudinary": "^2.9.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "exceljs": "^4.4.0",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.3",
+    "mongodb": "^7.1.0",
+    "multer": "^2.1.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}

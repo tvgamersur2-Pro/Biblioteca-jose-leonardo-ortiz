@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Reportes - Biblioteca</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="/css/admin.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        .stat-mini { background:#fff; border-radius:12px; padding:20px; box-shadow:0 2px 8px rgba(0,0,0,.06); text-align:center; }
+        .stat-mini .num { font-size:2rem; font-weight:800; }
+        .stat-mini .lbl { font-size:.82rem; color:#888; margin-top:4px; }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar"></div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="topbar">
+            <h4>Reportes</h4>
+            <div class="d-flex gap-2 align-items-center">
+                <div class="btn-group">
+                    <button class="btn btn-sm btn-success" onclick="exportarExcel('prestamos')">
+                        <i class="bi bi-file-earmark-excel me-1"></i>Exportar Préstamos
+                    </button>
+                    <button class="btn btn-sm btn-outline-success" onclick="exportarExcel('libros')">
+                        <i class="bi bi-book me-1"></i>Exportar Libros
+                    </button>
+                </div>
+                <div class="user-badge">
+                    <i class="bi bi-person-circle"></i>
+                    <span id="nombreUsuario">Usuario</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-md-3">
+                <div class="stat-mini"><div class="num text-primary" id="totalLibros">0</div><div class="lbl">Libros</div></div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-mini"><div class="num text-success" id="totalPrestamos">0</div><div class="lbl">Préstamos totales</div></div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-mini"><div class="num text-info" id="prestamosActivos">0</div><div class="lbl">Préstamos activos</div></div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-mini"><div class="num text-danger" id="prestamosVencidos">0</div><div class="lbl">Vencidos</div></div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Gráfico préstamos por mes -->
+            <div class="col-lg-7">
+                <div class="card-section">
+                    <h6><i class="bi bi-bar-chart me-2"></i>Préstamos por mes</h6>
+                    <canvas id="chartMes" height="120"></canvas>
+                </div>
+            </div>
+
+            <!-- Libros más prestados -->
+            <div class="col-lg-5">
+                <div class="card-section">
+                    <h6><i class="bi bi-trophy me-2"></i>Libros más prestados</h6>
+                    <div id="librosMasPrestados">
+                        <p class="text-muted mb-0">Cargando...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Préstamos vencidos -->
+            <div class="col-12" id="seccionVencidos" style="display:none">
+                <div class="card-section border-start border-danger border-3">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="text-danger mb-0">
+                            <i class="bi bi-exclamation-triangle me-2"></i>Préstamos vencidos (<span id="cantidadVencidos">0</span>)
+                        </h6>
+                        <button class="btn btn-sm btn-danger" onclick="exportarExcel('vencidos')">
+                            <i class="bi bi-file-earmark-excel me-1"></i>Exportar Vencidos
+                        </button>
+                    </div>
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr><th>Alumno</th><th>Grado</th><th>Libro</th><th>Fecha devolución</th><th>Días de retraso</th></tr>
+                        </thead>
+                        <tbody id="tablaVencidos"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/sidebar.js"></script>
+    <script src="/js/reportes.js"></script>
+</body>
+</html>
