@@ -41,4 +41,10 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'Servidor funcionando en Netlify Functions' });
 });
 
-module.exports.handler = serverless(app);
+module.exports.handler = serverless(app, {
+  binary: [
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'application/octet-stream',
+    'image/*'
+  ]
+});
