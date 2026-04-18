@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard.html
+Disallow: /libros.html
+Disallow: /autores.html
+Disallow: /categorias.html
+Disallow: /estantes.html
+Disallow: /prestamos.html
+Disallow: /usuarios.html
+Disallow: /perfiles.html
+Disallow: /reportes.html
+Disallow: /login.html
+Disallow: /js/
+Disallow: /css/
+
+Sitemap: https://biblioteca-jose-leonardo-ortiz.netlify.app/sitemap.xml
