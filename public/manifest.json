@@ -1,0 +1,21 @@
+{
+  "name": "Biblioteca Escolar José Leonardo Ortiz",
+  "short_name": "Biblioteca JLO",
+  "description": "Sistema de gestión bibliotecaria",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a3a5c",
+  "theme_color": "#1a3a5c",
+  "icons": [
+    {
+      "src": "/imagenes/Escudo-jose.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "/imagenes/Escudo-jose.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}
